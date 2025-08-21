@@ -1,0 +1,12 @@
+<div class="chat">
+  <div class="chat-history">
+    <p *ngIf="chat.length === 0">No messages sent</p>
+    <div *ngFor="let message of chat" class="message {{message.sent === true ? 'sent' : 'answer'}}">
+      <p>{{message.content}}</p>
+    </div>
+  </div>
+  <div class="chat-input">
+    <textarea id="chat-textarea" [formControl]="messageControl" placeholder="Ask me something ..."></textarea>
+    <button *ngIf="messageControl.value !== ''" (click)="sendMessage()"><span class="glyphicon glyphicon-send" aria-hidden="true"></span></button>
+  </div>
+</div>

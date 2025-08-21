@@ -24,9 +24,11 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {PageNotFoundComponent} from './parts/page-not-found/page-not-found.component';
 import {WelcomeComponent} from './parts/welcome/welcome.component';
+import {ChatbotComponent} from './chatbot/chatbot.component';
 
 const appRoutes: Routes = [
   {path: 'welcome', component: WelcomeComponent},
+  {path: 'chatbot',  component: ChatbotComponent},
   {path: '', component: WelcomeComponent},
   {path: '**', component: PageNotFoundComponent}
 ];

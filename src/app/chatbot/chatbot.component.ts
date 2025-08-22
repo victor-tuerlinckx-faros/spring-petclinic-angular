@@ -13,17 +13,25 @@ interface Message {
   styleUrls: ['./chatbot.component.css']
 })
 export class ChatbotComponent implements AfterViewInit {
-  chat: Message[] = [];
+  private LSK: string = 'PeClCL';
+  chat: Message[] = JSON.parse(localStorage.getItem(this.LSK)) ?? [];
   messageControl: FormControl<string> = new FormControl('', []);
 
   constructor(private chatbotService: ChatbotService) {
   }
 
   ngAfterViewInit(): void {
-    document.getElementById('chat-textarea').addEventListener('keypress', e => {
+    const textArea = document.getElementById('chat-textarea');
+    textArea.addEventListener('keypress', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         this.sendMessage();
+      }
+    });
+    textArea.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.restorePreviousPrompt();
       }
     });
   }
@@ -37,10 +45,35 @@ export class ChatbotComponent implements AfterViewInit {
 
   private addMessageToChat(message: Message) {
     this.chat.push(message);
+    localStorage.setItem(this.LSK, JSON.stringify(this.chat));
 
     setTimeout(() => {
       const history = document.getElementsByClassName('chat-history')[0];
       history.scrollTop = history.scrollHeight;
     }, 50);
+  }
+
+  deleteChat() {
+    localStorage.removeItem(this.LSK);
+    this.chat = [];
+  }
+
+  restorePreviousPrompt() {
+    const currentValue = this.messageControl.value;
+    const previousPrompts = [];
+    this.chat.filter(m => m.sent)
+      .map(m => m.content)
+      .forEach(p => {
+        if (!previousPrompts.includes(p)) previousPrompts.push(p)
+      });
+
+    if (previousPrompts.length > 0) {
+      if (!previousPrompts.includes(currentValue)) {
+        this.messageControl.setValue(previousPrompts[previousPrompts.length - 1] ?? currentValue);
+      } else {
+        const previousIndex = previousPrompts.indexOf(currentValue) - 1;
+        this.messageControl.setValue(previousIndex >= 0 ? previousPrompts[previousIndex] : previousPrompts[previousPrompts.length - 1]);
+      }
+    }
   }
 }
